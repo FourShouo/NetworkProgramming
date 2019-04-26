@@ -1,9 +1,10 @@
+//ã‚³ãƒ³ãƒ‘ã‚¤ãƒ«
+
 #include<sys/socket.h>
 #include<arpa/inet.h>
-#include<unistd.h>  //close—p
+#include<unistd.h>  //closeç”¨
 #include<string.h>
-
-//#include<stdio.h>
+#include<stdio.h>
 
 void commun(int);
 
@@ -29,8 +30,12 @@ int main(int argc,char **argv){
 }
 
 void commun(int sock){
-	char *message="Ä‚«’¹H‚×‚½‚¢!";
+	char buf[256];
+	char *message="ã‚Šã°ãƒ¼ã†ï¼›ã‚ªãƒ¼ã‚¯";
 	send(sock,message,strlen(message),0);
+	int len_r=recv(sock,buf,256,0);
+	buf[len_r]='\0';
+	printf("%s\n",buf);
 }
 
 
