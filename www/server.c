@@ -39,9 +39,18 @@ int main(int argc,char **argv){
 
 void commun(int sock){
 	char buf[BUF_SIZE];
-	int len_r=recv(sock,buf,BUF_SIZE,0);
-	char *message="リバーウォーク北九州";
+	char kuuhaku[]="\r\n\r\n";
+	int len_r;
+	//先生のプログラムにするときはここから
+	while(!strstr(buf,kuuhaku)){
+		len_r=recv(sock,buf,BUF_SIZE,0);
+		printf("%s\n",buf);
+		//if(len_r>0)break;
+	}
+	char *message="HTTP /1.1 200 OK \r\nContent-Type:text/html; charset=sift-jis\r\n\r\n<IDOVCTYPE html><html><head><title>ネットワークプログラミングのwebサイト</title></head><body>ネットワークダイスキ</body></html>";
 	if(len_r<=0)DieWithError("recv()failed");
+	printf("received HTTP Request.\n");
+	//ここまでを置き換える
 	buf[len_r]='\0';
 	printf("%s\n",buf);
 	if(send(sock,message,strlen(message),0)!=strlen(message))DieWithError("send() sent a massage of unexpected bytes");
@@ -52,7 +61,18 @@ void DieWithError(char *errorMessage){
 	exit(1);
 }
 
+/*
+先生のプログラム
 
+	while((len_r=recv(sock,buf,BUF_SIZE,0)>0){
+		buf[len_r]="\0";
+		printf("%s\n",buf);
+		if(strstr(buf,"\r\n\r\n"))break;
+	}
+	if(len_r<=0)DieWithError("recv()failed");
+	printf("received HTTP Request.\n");
+	
+*/
 
 
 

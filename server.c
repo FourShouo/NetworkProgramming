@@ -29,6 +29,7 @@ int main(int argc,char **argv){
 		szClientAddr=sizeof(clientAddress);
 		cliSock=accept(servSock,(struct sockaddr *)&clientAddress,&szClientAddr);
 		commun(cliSock);
+		close(cliSock);
 	}
 	
 	close(servSock);
