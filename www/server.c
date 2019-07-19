@@ -4,6 +4,7 @@
 #include<arpa/inet.h>
 #include<string.h>
 #include<stdlib.h>
+#include<regex.h>
 
 #define BUF_SIZE 256
 
@@ -44,16 +45,42 @@ void commun(int sock){
 	char kuuhaku[]="\r\n\r\n";
 	int len_r;
 	
+	regex_t regBuf;
+	regmatch_t regMatch[1];
+	
+	const char *pattern="GET[^\\n]+HTTP";
+	//const char *pattern="GET.+HTTP";
+	char result[100];
+	char *uri;
+	
+	result[0]='\0';
 	buf_old[0]='\0';
 	
-	char *message="HTTP /1.1 200 OK \r\nContent-Type:text/html; charset=shift-jis\r\n\r\n<IDOVCTYPE html><html><head><title>ネットワークプログラミングのwebサイト</title></head><body>ネットワークダイスキ</body></html>";
+	if(regcomp(&regBuf,pattern,REG_EXTENDED|REG_NEWLINE)!=0){
+		DieWithError("regcomp failed");
+	}
+	
+	char *message="HTTP /1.1 200 OK \r\nContent-Type:text/html; charset=utf-8\r\n\r\n<IDOVCTYPE html><html><head><title>ネットワークプログラミングのwebサイト</title></head><body>ネットワークダイスキ</body></html>";
 	
 	while(len_r=recv(sock,buf,BUF_SIZE,0)>0){
-		buf[len_r]="\0";
+		buf[len_r]='\0';
 		sprintf(buf2,"%s%s",buf_old,buf);
+		
+		if(regexec(&regBuf,buf2,1,regMatch,0)!=0){
+			int startIndex=regMatch[0].rm_so;
+			int endIndex=regMatch[0].rm_eo;
+			strncpy(result,buf2+startIndex,endIndex-startIndex);
+		}
+		
 		if(strstr(buf2,kuuhaku))break;
 		sprintf(buf_old,"%s",buf);
 	}
+	if(result[0]!='\0'){
+		uri=strtok(result," ");
+		uri=strtok(NULL," ");
+	}else DieWithError("No URI");
+	
+	regfree(&regBuf);
 		
 	if(len_r<=0)DieWithError("recv()failed");
 	printf("received HTTP Request.\n");
