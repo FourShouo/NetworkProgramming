@@ -43,4 +43,4 @@ int prepare_client_socktet(char *ipaddr, int port)
     return servSock;
 }
 
-//全然書くの途中です
+//全然書くの途中ですよ
